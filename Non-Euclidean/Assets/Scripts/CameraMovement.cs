@@ -14,19 +14,33 @@ public class CameraMovement : MonoBehaviour
     public float MouseSensativityX = 1.0f;
     public float MouseSensativityY = 1.0f;
 
-    private Rigidbody _myRigid;
+    private Vector3 _lastFixedPosition;
+    private Vector3 _nextFixedPosition;
+
+    private CharacterController _myCharacter;
     [SerializeField] private GameObject _myBody;
 
     void Start()
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        _myRigid = _myBody.GetComponent<Rigidbody>();
+        _myCharacter = _myBody.GetComponent<CharacterController>(); 
+        _lastFixedPosition = _myCharacter.transform.position;
+        _nextFixedPosition = _myCharacter.transform.position;
     }
 
     void Update()
     {
+        _horizontalInput = Input.GetAxisRaw("Horizontal");
+        _verticalInput = Input.GetAxisRaw("Vertical");
+
         CameraLookAround();
+        float interpolationAlpha = (Time.time - Time.fixedTime) / Time.fixedDeltaTime;
+        _myCharacter.Move(Vector3.Lerp(_lastFixedPosition, _nextFixedPosition, interpolationAlpha) - _myCharacter.transform.position);
+    }
+
+    void FixedUpdate()
+    {
         CameraMoveAround();
     }
 
@@ -42,14 +56,13 @@ public class CameraMovement : MonoBehaviour
 
     private void CameraMoveAround()
     {
-        _horizontalInput = Input.GetAxisRaw("Horizontal");
-        _verticalInput = Input.GetAxisRaw("Vertical");
+        _lastFixedPosition = _nextFixedPosition;
 
         Vector3 moveDirection = transform.TransformDirection(new Vector3(_horizontalInput, 0f, _verticalInput));
         moveDirection = new Vector3(moveDirection.x, 0, moveDirection.z);
         moveDirection.Normalize();
 
-        Vector3 moveOffset = moveDirection * (MyPlayerSpeed * Time.fixedDeltaTime);
-        _myRigid.MovePosition(_myRigid.position + moveOffset);
+        Vector3 moveVelocity = moveDirection * MyPlayerSpeed;
+        _nextFixedPosition +=  moveVelocity * Time.fixedDeltaTime;
     }
 }
