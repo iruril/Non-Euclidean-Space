@@ -37,6 +37,7 @@ public class CameraMovement : MonoBehaviour
 
         _yMove = Mathf.Clamp(_yMove, -55f, 55f);
         _myBody.transform.localRotation = Quaternion.Euler(0, _xMove, 0);
+        this.transform.rotation = Quaternion.Euler(_yMove, _xMove, 0);
     }
 
     private void CameraMoveAround()
