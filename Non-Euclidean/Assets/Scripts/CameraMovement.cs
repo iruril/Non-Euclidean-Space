@@ -14,8 +14,7 @@ public class CameraMovement : MonoBehaviour
     public float MouseSensativityX = 1.0f;
     public float MouseSensativityY = 1.0f;
 
-    private Vector3 _lastFixedPosition;
-    private Vector3 _nextFixedPosition;
+    private Vector3 _playerVelocity = Vector3.zero;
 
     private CharacterController _myCharacter;
     [SerializeField] private GameObject _myBody;
@@ -24,9 +23,7 @@ public class CameraMovement : MonoBehaviour
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        _myCharacter = _myBody.GetComponent<CharacterController>(); 
-        _lastFixedPosition = _myCharacter.transform.position;
-        _nextFixedPosition = _myCharacter.transform.position;
+        _myCharacter = _myBody.GetComponent<CharacterController>();
     }
 
     void Update()
@@ -35,8 +32,7 @@ public class CameraMovement : MonoBehaviour
         _verticalInput = Input.GetAxisRaw("Vertical");
 
         CameraLookAround();
-        float interpolationAlpha = (Time.time - Time.fixedTime) / Time.fixedDeltaTime;
-        _myCharacter.Move(Vector3.Lerp(_lastFixedPosition, _nextFixedPosition, interpolationAlpha) - _myCharacter.transform.position);
+        _myCharacter.Move(_playerVelocity * Time.deltaTime);
     }
 
     void FixedUpdate()
@@ -56,13 +52,22 @@ public class CameraMovement : MonoBehaviour
 
     private void CameraMoveAround()
     {
-        _lastFixedPosition = _nextFixedPosition;
+        Vector3 moveVelocity = transform.TransformDirection(new Vector3(_horizontalInput, 0f, _verticalInput));
+        moveVelocity = new Vector3(moveVelocity.x, 0, moveVelocity.z);
+        Vector3 moveDirection = moveVelocity.normalized;
 
-        Vector3 moveDirection = transform.TransformDirection(new Vector3(_horizontalInput, 0f, _verticalInput));
-        moveDirection = new Vector3(moveDirection.x, 0, moveDirection.z);
-        moveDirection.Normalize();
+        float moveSpeed = Mathf.Min(moveVelocity.magnitude, 1.0f) * MyPlayerSpeed;
+        Vector3 _playerMove = moveDirection * moveSpeed;
+        float gravity = 0;
+        if (!_myCharacter.isGrounded)
+        {
+            gravity = _playerVelocity.y - 9.8f * Time.fixedDeltaTime;
+        }
+        else
+        {
+            gravity = Mathf.Max(0.0f, _playerVelocity.y);
+        }
 
-        Vector3 moveVelocity = moveDirection * MyPlayerSpeed;
-        _nextFixedPosition +=  moveVelocity * Time.fixedDeltaTime;
+        _playerVelocity = new Vector3(_playerMove.x, gravity, _playerMove.z);
     }
 }
