@@ -14,7 +14,7 @@ public class CameraMovement : MonoBehaviour
     public float MouseSensativityX = 1.0f;
     public float MouseSensativityY = 1.0f;
 
-    private Vector3 _playerVelocity = Vector3.zero;
+    public Vector3 PlayerVelocity = Vector3.zero;
 
     private CharacterController _myCharacter;
     [SerializeField] private GameObject _myBody;
@@ -32,7 +32,12 @@ public class CameraMovement : MonoBehaviour
         _verticalInput = Input.GetAxisRaw("Vertical");
 
         CameraLookAround();
-        _myCharacter.Move(_playerVelocity * Time.deltaTime);
+        _myCharacter.Move(PlayerVelocity * Time.deltaTime);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            _myCharacter.transform.position = new Vector3(0, 10f, 0);
+        }
     }
 
     void FixedUpdate()
@@ -61,13 +66,13 @@ public class CameraMovement : MonoBehaviour
         float gravity = 0;
         if (!_myCharacter.isGrounded)
         {
-            gravity = _playerVelocity.y - 9.8f * Time.fixedDeltaTime;
+            gravity = PlayerVelocity.y - 9.8f * Time.fixedDeltaTime;
         }
         else
         {
-            gravity = Mathf.Max(0.0f, _playerVelocity.y);
+            gravity = Mathf.Max(0.0f, PlayerVelocity.y);
         }
 
-        _playerVelocity = new Vector3(_playerMove.x, gravity, _playerMove.z);
+        PlayerVelocity = new Vector3(_playerMove.x, gravity, _playerMove.z);
     }
 }
