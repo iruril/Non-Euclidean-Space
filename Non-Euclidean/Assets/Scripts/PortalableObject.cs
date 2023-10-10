@@ -24,8 +24,8 @@ public class PortalableObject : MonoBehaviour
     {
         cloneObject = new GameObject();
         cloneObject.SetActive(false);
-        var meshFilter = cloneObject.AddComponent<MeshFilter>();
-        var meshRenderer = cloneObject.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = cloneObject.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = cloneObject.AddComponent<MeshRenderer>();
 
         meshFilter.mesh = GetComponent<MeshFilter>().mesh;
         meshRenderer.materials = GetComponent<MeshRenderer>().materials;
@@ -44,8 +44,8 @@ public class PortalableObject : MonoBehaviour
 
         if(cloneObject.activeSelf && inPortal.IsPlaced && outPortal.IsPlaced)
         {
-            var inTransform = inPortal.transform;
-            var outTransform = outPortal.transform;
+            Transform inTransform = inPortal.transform;
+            Transform outTransform = outPortal.transform;
 
             // Update position of clone.
             Vector3 relativePos = inTransform.InverseTransformPoint(transform.position);
@@ -68,7 +68,7 @@ public class PortalableObject : MonoBehaviour
         this.inPortal = inPortal;
         this.outPortal = outPortal;
 
-        Physics.IgnoreCollision(collider, wallCollider);
+        //Physics.IgnoreCollision(collider, wallCollider);
 
         cloneObject.SetActive(false);
 
@@ -77,7 +77,7 @@ public class PortalableObject : MonoBehaviour
 
     public void ExitPortal(Collider wallCollider)
     {
-        Physics.IgnoreCollision(collider, wallCollider, false);
+        //Physics.IgnoreCollision(collider, wallCollider, false);
         --inPortalCount;
 
         if (inPortalCount == 0)
@@ -88,8 +88,8 @@ public class PortalableObject : MonoBehaviour
 
     public virtual void Warp()
     {
-        var inTransform = inPortal.transform;
-        var outTransform = outPortal.transform;
+        Transform inTransform = inPortal.transform;
+        Transform outTransform = outPortal.transform;
 
         // Update position of object.
         Vector3 relativePos = inTransform.InverseTransformPoint(transform.position);
@@ -107,7 +107,7 @@ public class PortalableObject : MonoBehaviour
         rigidbody.velocity = outTransform.TransformDirection(relativeVel);
 
         // Swap portal references.
-        var tmp = inPortal;
+        Portal tmp = inPortal;
         inPortal = outPortal;
         outPortal = tmp;
     }

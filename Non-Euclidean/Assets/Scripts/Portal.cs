@@ -21,7 +21,7 @@ public class Portal : MonoBehaviour
     private Transform testTransform;
 
     private List<PortalableObject> portalObjects = new List<PortalableObject>();
-    public bool IsPlaced { get; private set; } = false;
+    public bool IsPlaced { get; private set; } = true;
     private Collider wallCollider;
 
     // Components.
@@ -31,14 +31,15 @@ public class Portal : MonoBehaviour
     private void Awake()
     {
         collider = GetComponent<BoxCollider>();
-        Renderer = GetComponentInChildren<Renderer>();
+        Renderer = transform.GetChild(0).GetChild(0).GetComponent<Renderer>();
+        testTransform = this.transform;
     }
 
     private void Start()
     {
         //outlineRenderer.material.SetColor("_OutlineColour", PortalColour);
         
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
     private void Update()
@@ -58,7 +59,7 @@ public class Portal : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        var obj = other.GetComponent<PortalableObject>();
+        PortalableObject obj = other.GetComponent<PortalableObject>();
         if (obj != null)
         {
             portalObjects.Add(obj);
@@ -68,7 +69,7 @@ public class Portal : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        var obj = other.GetComponent<PortalableObject>();
+        PortalableObject obj = other.GetComponent<PortalableObject>();
 
         if(portalObjects.Contains(obj))
         {
@@ -103,7 +104,7 @@ public class Portal : MonoBehaviour
     // Ensure the portal cannot extend past the edge of a surface.
     private void FixOverhangs()
     {
-        var testPoints = new List<Vector3>
+        List<Vector3> testPoints = new List<Vector3>
         {
             new Vector3(-1.1f,  0.0f, 0.1f),
             new Vector3( 1.1f,  0.0f, 0.1f),
@@ -111,7 +112,7 @@ public class Portal : MonoBehaviour
             new Vector3( 0.0f,  2.1f, 0.1f)
         };
 
-        var testDirs = new List<Vector3>
+        List<Vector3> testDirs = new List<Vector3>
         {
              Vector3.right,
             -Vector3.right,
@@ -131,7 +132,7 @@ public class Portal : MonoBehaviour
             }
             else if(Physics.Raycast(raycastPos, raycastDir, out hit, 2.1f, placementMask))
             {
-                var offset = hit.point - raycastPos;
+                Vector3 offset = hit.point - raycastPos;
                 testTransform.Translate(offset, Space.World);
             }
         }
@@ -140,7 +141,7 @@ public class Portal : MonoBehaviour
     // Ensure the portal cannot intersect a section of wall.
     private void FixIntersects()
     {
-        var testDirs = new List<Vector3>
+        List<Vector3> testDirs = new List<Vector3>
         {
              Vector3.right,
             -Vector3.right,
@@ -148,7 +149,7 @@ public class Portal : MonoBehaviour
             -Vector3.up
         };
 
-        var testDists = new List<float> { 1.1f, 1.1f, 2.1f, 2.1f };
+        List<float> testDists = new List<float> { 1.1f, 1.1f, 2.1f, 2.1f };
 
         for (int i = 0; i < 4; ++i)
         {
@@ -158,8 +159,8 @@ public class Portal : MonoBehaviour
 
             if (Physics.Raycast(raycastPos, raycastDir, out hit, testDists[i], placementMask))
             {
-                var offset = (hit.point - raycastPos);
-                var newOffset = -raycastDir * (testDists[i] - offset.magnitude);
+                Vector3 offset = (hit.point - raycastPos);
+                Vector3 newOffset = -raycastDir * (testDists[i] - offset.magnitude);
                 testTransform.Translate(newOffset, Space.World);
             }
         }
@@ -168,9 +169,9 @@ public class Portal : MonoBehaviour
     // Once positioning has taken place, ensure the portal isn't intersecting anything.
     private bool CheckOverlap()
     {
-        var checkExtents = new Vector3(0.9f, 1.9f, 0.05f);
+        Vector3 checkExtents = new Vector3(0.9f, 1.9f, 0.05f);
 
-        var checkPositions = new Vector3[]
+        Vector3[] checkPositions = new Vector3[]
         {
             testTransform.position + testTransform.TransformVector(new Vector3( 0.0f,  0.0f, -0.1f)),
 
@@ -182,8 +183,7 @@ public class Portal : MonoBehaviour
             testTransform.TransformVector(new Vector3(0.0f, 0.0f, 0.2f))
         };
 
-        // Ensure the portal does not intersect walls.
-        var intersections = Physics.OverlapBox(checkPositions[0], checkExtents, testTransform.rotation, placementMask);
+        Collider[] intersections = Physics.OverlapBox(checkPositions[0], checkExtents, testTransform.rotation, placementMask);
 
         if(intersections.Length > 1)
         {
@@ -191,14 +191,12 @@ public class Portal : MonoBehaviour
         }
         else if(intersections.Length == 1) 
         {
-            // We are allowed to intersect the old portal position.
             if (intersections[0] != collider)
             {
                 return false;
             }
         }
 
-        // Ensure the portal corners overlap a surface.
         bool isOverlapping = true;
 
         for(int i = 1; i < checkPositions.Length - 1; ++i)

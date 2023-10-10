@@ -31,8 +31,8 @@ public class PortalCamera : MonoBehaviour
 
     private void Start()
     {
-        portals[0].Renderer.material.mainTexture = tempTexture1;
-        portals[1].Renderer.material.mainTexture = tempTexture2;
+        portals[0].Renderer.material.SetTexture("_MainTex", tempTexture1);
+        portals[1].Renderer.material.SetTexture("_MainTex", tempTexture2);
     }
 
     private void OnEnable()
@@ -82,18 +82,15 @@ public class PortalCamera : MonoBehaviour
 
         for(int i = 0; i <= iterationID; ++i)
         {
-            // Position the camera behind the other portal.
             Vector3 relativePos = inTransform.InverseTransformPoint(cameraTransform.position);
             relativePos = Quaternion.Euler(0.0f, 180.0f, 0.0f) * relativePos;
             cameraTransform.position = outTransform.TransformPoint(relativePos);
 
-            // Rotate the camera to look through the other portal.
             Quaternion relativeRot = Quaternion.Inverse(inTransform.rotation) * cameraTransform.rotation;
             relativeRot = Quaternion.Euler(0.0f, 180.0f, 0.0f) * relativeRot;
             cameraTransform.rotation = outTransform.rotation * relativeRot;
         }
 
-        // Set the camera's oblique view frustum.
         Plane p = new Plane(-outTransform.forward, outTransform.position);
         Vector4 clipPlaneWorldSpace = new Vector4(p.normal.x, p.normal.y, p.normal.z, p.distance);
         Vector4 clipPlaneCameraSpace =
@@ -102,7 +99,6 @@ public class PortalCamera : MonoBehaviour
         var newMatrix = mainCamera.CalculateObliqueMatrix(clipPlaneCameraSpace);
         portalCamera.projectionMatrix = newMatrix;
 
-        // Render the camera to its render target.
         UniversalRenderPipeline.RenderSingleCamera(SRC, portalCamera);
     }
 }

@@ -2,7 +2,7 @@
 {
     Properties
     {
-		_MainTex("Main Texture", 2D) = "white" {}
+		_MainTex("Texture", 2D) = "white" {}
     }
     SubShader
     {
@@ -12,6 +12,8 @@
 			"Queue" = "Geometry"
 			"RenderPipeline" = "UniversalPipeline"
 		}
+		LOD 100
+		Cull Off
 
 		HLSLINCLUDE
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -19,44 +21,43 @@
 
         Pass
         {
-			Name "Mask"
-
-			Stencil
-			{
-				Ref 1
-				Pass replace
-			}
-
 			HLSLPROGRAM
 				#pragma vertex vert
 				#pragma fragment frag
 
-				struct appdata
+				struct Attributes
 				{
 					float4 vertex : POSITION;
+					float2 uv : TEXCOORD0;
 				};
 
-				struct v2f
+				struct Varyings
 				{
 					float4 vertex : SV_POSITION;
-					float4 screenPos : TEXCOORD0;
+					float2 uv : TEXCOORD0;
 				};
 
-				v2f vert(appdata v)
+				CBUFFER_START(UnityPerMaterial)
+				float4 _MainTex_ST;
+				CBUFFER_END
+
+				TEXTURE2D(_MainTex);
+				SAMPLER(sampler_MainTex);
+
+				Varyings vert(Attributes v)
 				{
-					v2f o;
+					Varyings o;
 					o.vertex = TransformObjectToHClip(v.vertex.xyz);
-					o.screenPos = ComputeScreenPos(o.vertex);
+					o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+					float4 clipVertex = o.vertex / o.vertex.w;
+					o.uv = ComputeScreenPos(clipVertex).xy;
 					return o;
 				}
 
-				uniform sampler2D _MainTex;
-
-				float4 frag(v2f i) : SV_Target
+				half4 frag(Varyings i) : SV_Target
 				{
-					float2 uv = i.screenPos.xy / i.screenPos.w;
-					float4 col = tex2D(_MainTex, uv);
-					return col;
+					half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+					return color;
 				}
 			ENDHLSL
         }
