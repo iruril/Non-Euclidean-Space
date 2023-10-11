@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PortalableObject : MonoBehaviour
 {
+    [SerializeField] private Material _cloneMaterial = null;
     private GameObject cloneObject;
 
     private int _inPortalCount = 0;
@@ -24,7 +25,13 @@ public class PortalableObject : MonoBehaviour
         MeshRenderer meshRenderer = cloneObject.AddComponent<MeshRenderer>();
 
         meshFilter.mesh = GetComponent<MeshFilter>().mesh;
+
         meshRenderer.materials = GetComponent<MeshRenderer>().materials;
+        for(int i = 0; i < GetComponent<MeshRenderer>().materials.Length; i++)
+        {
+            meshRenderer.materials[i] = _cloneMaterial;
+            meshRenderer.materials[i].SetTexture("_MainTexture", GetComponent<MeshRenderer>().materials[i].mainTexture);
+        }
         cloneObject.transform.localScale = transform.localScale;
 
         _myRigid = GetComponent<Rigidbody>();

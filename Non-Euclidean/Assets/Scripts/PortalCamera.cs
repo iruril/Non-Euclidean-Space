@@ -92,7 +92,7 @@ public class PortalCamera : MonoBehaviour
         Vector4 clipPlaneWorldSpace = new Vector4(p.normal.x, p.normal.y, p.normal.z, p.distance);
         Vector4 clipPlaneCameraSpace = Matrix4x4.Transpose(Matrix4x4.Inverse(_portalCamera.worldToCameraMatrix)) * clipPlaneWorldSpace;
 
-        var newMatrix = mainCamera.CalculateObliqueMatrix(clipPlaneCameraSpace);
+        Matrix4x4 newMatrix = mainCamera.CalculateObliqueMatrix(clipPlaneCameraSpace);
         _portalCamera.projectionMatrix = newMatrix;
 
         UniversalRenderPipeline.RenderSingleCamera(SRC, _portalCamera);
