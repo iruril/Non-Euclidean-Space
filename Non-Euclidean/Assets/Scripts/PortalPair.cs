@@ -12,7 +12,7 @@ public class PortalPair : MonoBehaviour
 
         if(Portals.Length != 2)
         {
-            Debug.LogError("PortalPair children must contain exactly two Portal components in total.");
+            Debug.LogError("포탈의 짝이 맞지 않습니다.");
         }
     }
 }

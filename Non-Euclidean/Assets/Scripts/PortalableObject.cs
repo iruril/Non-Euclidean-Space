@@ -2,21 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Collider))]
 public class PortalableObject : MonoBehaviour
 {
     private GameObject cloneObject;
 
-    private int inPortalCount = 0;
+    private int _inPortalCount = 0;
     
-    private Portal inPortal;
-    private Portal outPortal;
+    private Portal _inPortal;
+    private Portal _outPortal;
 
-    private new Rigidbody rigidbody;
-    protected new Collider collider;
+    private Rigidbody _myRigid;
+    protected Collider _myCollider;
 
     private static readonly Quaternion halfTurn = Quaternion.Euler(0.0f, 180.0f, 0.0f);
 
@@ -31,28 +27,26 @@ public class PortalableObject : MonoBehaviour
         meshRenderer.materials = GetComponent<MeshRenderer>().materials;
         cloneObject.transform.localScale = transform.localScale;
 
-        rigidbody = GetComponent<Rigidbody>();
-        collider = GetComponent<Collider>();
+        _myRigid = GetComponent<Rigidbody>();
+        _myCollider = GetComponent<Collider>();
     }
 
     private void LateUpdate()
     {
-        if(inPortal == null || outPortal == null)
+        if(_inPortal == null || _outPortal == null)
         {
             return;
         }
 
-        if(cloneObject.activeSelf && inPortal.IsPlaced && outPortal.IsPlaced)
+        if(cloneObject.activeSelf)
         {
-            Transform inTransform = inPortal.transform;
-            Transform outTransform = outPortal.transform;
+            Transform inTransform = _inPortal.transform;
+            Transform outTransform = _outPortal.transform;
 
-            // Update position of clone.
             Vector3 relativePos = inTransform.InverseTransformPoint(transform.position);
             relativePos = halfTurn * relativePos;
             cloneObject.transform.position = outTransform.TransformPoint(relativePos);
 
-            // Update rotation of clone.
             Quaternion relativeRot = Quaternion.Inverse(inTransform.rotation) * transform.rotation;
             relativeRot = halfTurn * relativeRot;
             cloneObject.transform.rotation = outTransform.rotation * relativeRot;
@@ -63,24 +57,21 @@ public class PortalableObject : MonoBehaviour
         }
     }
 
-    public void SetIsInPortal(Portal inPortal, Portal outPortal, Collider wallCollider)
+    public void SetIsInPortal(Portal inPortal, Portal outPortal)
     {
-        this.inPortal = inPortal;
-        this.outPortal = outPortal;
+        this._inPortal = inPortal;
+        this._outPortal = outPortal;
 
-        //Physics.IgnoreCollision(collider, wallCollider);
+        cloneObject.SetActive(true);
 
-        cloneObject.SetActive(false);
-
-        ++inPortalCount;
+        ++_inPortalCount;
     }
 
-    public void ExitPortal(Collider wallCollider)
+    public void ExitPortal()
     {
-        //Physics.IgnoreCollision(collider, wallCollider, false);
-        --inPortalCount;
+        --_inPortalCount;
 
-        if (inPortalCount == 0)
+        if (_inPortalCount == 0)
         {
             cloneObject.SetActive(false);
         }
@@ -88,27 +79,23 @@ public class PortalableObject : MonoBehaviour
 
     public virtual void Warp()
     {
-        Transform inTransform = inPortal.transform;
-        Transform outTransform = outPortal.transform;
+        Transform inTransform = _inPortal.transform;
+        Transform outTransform = _outPortal.transform;
 
-        // Update position of object.
         Vector3 relativePos = inTransform.InverseTransformPoint(transform.position);
         relativePos = halfTurn * relativePos;
         transform.position = outTransform.TransformPoint(relativePos);
 
-        // Update rotation of object.
         Quaternion relativeRot = Quaternion.Inverse(inTransform.rotation) * transform.rotation;
         relativeRot = halfTurn * relativeRot;
         transform.rotation = outTransform.rotation * relativeRot;
 
-        // Update velocity of rigidbody.
-        Vector3 relativeVel = inTransform.InverseTransformDirection(rigidbody.velocity);
+        Vector3 relativeVel = inTransform.InverseTransformDirection(_myRigid.velocity);
         relativeVel = halfTurn * relativeVel;
-        rigidbody.velocity = outTransform.TransformDirection(relativeVel);
+        _myRigid.velocity = outTransform.TransformDirection(relativeVel);
 
-        // Swap portal references.
-        Portal tmp = inPortal;
-        inPortal = outPortal;
-        outPortal = tmp;
+        Portal tmp = _inPortal;
+        _inPortal = _outPortal;
+        _outPortal = tmp;
     }
 }
