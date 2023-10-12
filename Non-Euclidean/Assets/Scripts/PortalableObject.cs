@@ -5,6 +5,8 @@ using UnityEngine;
 public class PortalableObject : MonoBehaviour
 {
     [SerializeField] private Material _cloneMaterial = null;
+    private Material[] _myMaterials = null;
+    private Material[] _myCloneMaterials = null;
     private GameObject cloneObject;
 
     private int _inPortalCount = 0;
@@ -14,6 +16,8 @@ public class PortalableObject : MonoBehaviour
 
     private Rigidbody _myRigid;
     protected Collider _myCollider;
+
+    private float _colRadius = 0;
 
     private static readonly Quaternion halfTurn = Quaternion.Euler(0.0f, 180.0f, 0.0f);
 
@@ -25,17 +29,29 @@ public class PortalableObject : MonoBehaviour
         MeshRenderer meshRenderer = cloneObject.AddComponent<MeshRenderer>();
 
         meshFilter.mesh = GetComponent<MeshFilter>().mesh;
-
-        meshRenderer.materials = GetComponent<MeshRenderer>().materials;
-        for(int i = 0; i < GetComponent<MeshRenderer>().materials.Length; i++)
+        _myMaterials = GetComponent<MeshRenderer>().materials;
+        _myCloneMaterials = _myMaterials;
+        for(int i = 0; i < _myMaterials.Length; i++)
         {
-            meshRenderer.materials[i] = _cloneMaterial;
-            meshRenderer.materials[i].SetTexture("_MainTexture", GetComponent<MeshRenderer>().materials[i].mainTexture);
+            _myCloneMaterials[i] = _cloneMaterial;
+            _myCloneMaterials[i].SetTexture("_MainTexture", GetComponent<MeshRenderer>().materials[i].mainTexture);
         }
+        meshRenderer.materials = _myCloneMaterials;
+        _myCloneMaterials = cloneObject.GetComponent<MeshRenderer>().materials;
         cloneObject.transform.localScale = transform.localScale;
 
         _myRigid = GetComponent<Rigidbody>();
         _myCollider = GetComponent<Collider>();
+        _colRadius = _myCollider.bounds.extents.magnitude;
+        //Debug.Log(_colRadius);
+    }
+
+    private void FixedUpdate()
+    {
+        if (cloneObject.activeSelf)
+        {
+            SetCloneSliceValueOnIn();
+        }
     }
 
     private void LateUpdate()
@@ -84,6 +100,23 @@ public class PortalableObject : MonoBehaviour
         }
     }
 
+    private void SetCloneSliceValueOnIn() //for Clone
+    {
+        Vector3 sliceNormal = _outPortal.transform.forward;
+        Vector3 sliceCenter = _outPortal.transform.position;
+        if (Physics.Raycast(cloneObject.transform.position, -sliceNormal,out RaycastHit hitInfo ,_colRadius + 1.0f, 1 << LayerMask.NameToLayer("Portal")))
+        {
+            float dist = Vector3.Distance(hitInfo.point, cloneObject.transform.position);
+            float sliceOffset = (dist / _colRadius) + 0.5f; //0.5 is portal trigger value fixe it later.
+            for(int i =0;i< _myCloneMaterials.Length; i++)
+            {
+                _myCloneMaterials[i].SetVector("_SliceNormal", -sliceNormal);
+                _myCloneMaterials[i].SetVector("_SliceCenter", sliceCenter);
+                _myCloneMaterials[i].SetFloat("_SliceOffset", sliceOffset);
+            }
+        }
+    }
+
     public virtual void Warp()
     {
         Transform inTransform = _inPortal.transform;
@@ -104,5 +137,12 @@ public class PortalableObject : MonoBehaviour
         Portal tmp = _inPortal;
         _inPortal = _outPortal;
         _outPortal = tmp;
+
+        SetCloneSliceValueOnIn();
+    }
+
+    int SideOfPortal(Vector3 myPos, Transform portalTranform)
+    {
+        return System.Math.Sign(Vector3.Dot((myPos - portalTranform.position).normalized, portalTranform.forward));
     }
 }
