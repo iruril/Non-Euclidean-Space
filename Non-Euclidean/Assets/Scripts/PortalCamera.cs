@@ -33,8 +33,8 @@ public class PortalCamera : MonoBehaviour
 
     private void Start()
     {
-        _portalIn.Renderer.material.SetTexture("_MainTexture", _portalTextureIn);
-        _portalOut.Renderer.material.SetTexture("_MainTexture", _portalTextureOut);
+        _portalIn.PortalScreenRenderer.material.SetTexture("_MainTexture", _portalTextureIn);
+        _portalOut.PortalScreenRenderer.material.SetTexture("_MainTexture", _portalTextureOut);
     }
 
     private void OnEnable()
@@ -49,7 +49,7 @@ public class PortalCamera : MonoBehaviour
 
     void UpdateCamera(ScriptableRenderContext SRC, Camera camera)
     {
-        if (_portalIn.Renderer.isVisible)
+        if (_portalIn.PortalScreenRenderer.isVisible)
         {
             _portalCamera.targetTexture = _portalTextureIn;
             for (int i = _iterations - 1; i >= 0; --i)
@@ -58,7 +58,7 @@ public class PortalCamera : MonoBehaviour
             }
         }
 
-        if(_portalOut.Renderer.isVisible)
+        if(_portalOut.PortalScreenRenderer.isVisible)
         {
             _portalCamera.targetTexture = _portalTextureOut;
             for (int i = _iterations - 1; i >= 0; --i)

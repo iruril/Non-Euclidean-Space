@@ -5,14 +5,14 @@ using UnityEngine;
 public class Portal : MonoBehaviour
 {
     [field:SerializeField]
-    public Portal OtherPortal { get; private set; }
+    public Portal PairPortal { get; private set; }
 
     private List<PortalableObject> _portalObjects = new();
 
-    public Renderer Renderer { get; private set; }
+    public Renderer PortalScreenRenderer { get; private set; }
     private void Awake()
     {
-        Renderer = transform.GetChild(0).GetChild(0).GetComponent<Renderer>();
+        PortalScreenRenderer = transform.GetChild(0).GetChild(0).GetComponent<Renderer>();
     }
 
     private void Update()
@@ -34,7 +34,7 @@ public class Portal : MonoBehaviour
         if (obj != null)
         {
             _portalObjects.Add(obj);
-            obj.SetIsInPortal(this, OtherPortal);
+            obj.SetIsInPortal(this, PairPortal);
         }
     }
 
