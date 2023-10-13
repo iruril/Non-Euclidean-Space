@@ -42,7 +42,7 @@ public class PortalableObject : MonoBehaviour
 
         _myRigid = GetComponent<Rigidbody>();
         _myCollider = GetComponent<Collider>();
-        _colRadius = GetComponent<SphereCollider>().radius;
+        _colRadius = GetComponent<SphereCollider>().radius * this.transform.localScale.x;
     }
 
     private void FixedUpdate()
@@ -110,27 +110,10 @@ public class PortalableObject : MonoBehaviour
     {
         Vector3 sliceNormal = -_outPortal.transform.forward;
         Vector3 sliceCenter = _outPortal.transform.position;
-
         Vector3 startPos = cloneObject.transform.position - sliceNormal * _colRadius;
-        //if (Physics.Raycast(rayStartPos, -sliceNormal,out RaycastHit hitInfo, 2 * _colRadius + 1.0f, 1 << LayerMask.NameToLayer("Portal"),
-        //    QueryTriggerInteraction.Collide))
-        //{
-        //    Debug.Log("Portal Screen! Clone");
-        //    float dist = Vector3.Distance(hitInfo.point, rayStartPos);
-        //    if (dist > 2 * _colRadius) return;
-
-        //    float sliceOffset = dist / (2 * _colRadius);
-        //    for (int i = 0; i < _myCloneMaterials.Length; i++)
-        //    {
-        //        _myCloneMaterials[i].SetVector("_SliceNormal", sliceNormal);
-        //        _myCloneMaterials[i].SetVector("_SliceCenter", sliceCenter);
-        //        _myCloneMaterials[i].SetFloat("_SliceOffset", 1f - sliceOffset);
-        //    }
-        //}
         float dist = Vector3.Distance(_outPortal.PortalScreenRenderer.GetComponent<MeshCollider>().ClosestPoint(startPos), startPos);
-        float sliceOffset = dist / (2 * _colRadius);
+        float sliceOffset = Mathf.Lerp(0.4f, 1.6f, dist / _colRadius) - 0.6f;
 
-        return; // test
         for (int i = 0; i < _myCloneMaterials.Length; i++)
         {
             _myCloneMaterials[i].SetVector("_SliceNormal", sliceNormal);
@@ -143,32 +126,15 @@ public class PortalableObject : MonoBehaviour
     {
         Vector3 sliceNormal = _inPortal.transform.forward;
         Vector3 sliceCenter = _inPortal.transform.position;
-
         Vector3 startPos = this.transform.position - sliceNormal * _colRadius;
-        //if (Physics.Raycast(rayStartPos, -sliceNormal, out RaycastHit hitInfo, 2 * _colRadius + 1.0f, 1 << LayerMask.NameToLayer("Portal"),
-        //    QueryTriggerInteraction.Collide))
-        //{
-        //    Debug.Log("Portal Screen! My");
-        //    float dist = Vector3.Distance(hitInfo.point, rayStartPos);
-        //    if (dist > 2 * _colRadius) return;
-
-        //    float sliceOffset = dist / (2 * _colRadius);
-        //    for (int i = 0; i < _myMaterials.Length; i++)
-        //    {
-        //        GetComponent<MeshRenderer>().materials[i].SetVector("_SliceNormal", -sliceNormal);
-        //        GetComponent<MeshRenderer>().materials[i].SetVector("_SliceCenter", sliceCenter);
-        //        GetComponent<MeshRenderer>().materials[i].SetFloat("_SliceOffset", 1f - sliceOffset);
-        //    }
-        //}
         float dist = Vector3.Distance(_inPortal.PortalScreenRenderer.GetComponent<MeshCollider>().ClosestPoint(startPos), startPos);
-        float sliceOffset = dist / (2 * _colRadius);
+        float sliceOffset = Mathf.Lerp(0.4f, 1.6f , dist / _colRadius) - 0.6f;
 
-        return; // test
         for (int i = 0; i < _myMaterials.Length; i++)
         {
             GetComponent<MeshRenderer>().materials[i].SetVector("_SliceNormal", -sliceNormal);
             GetComponent<MeshRenderer>().materials[i].SetVector("_SliceCenter", sliceCenter);
-            GetComponent<MeshRenderer>().materials[i].SetFloat("_SliceOffset", 1f - sliceOffset);
+            GetComponent<MeshRenderer>().materials[i].SetFloat("_SliceOffset", sliceOffset);
         }
     }
 
