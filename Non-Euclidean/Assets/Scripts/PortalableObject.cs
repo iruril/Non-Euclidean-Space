@@ -48,18 +48,18 @@ public class PortalableObject : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (cloneObject.activeSelf)
-        {
-            SetCloneSliceValueOnIn();
-            SetMySliceValueOnIn();
-        }
-
         if (_inPortal != null && _outPortal != null)
         {
             if (_inPortal.PortalPair.CheckThisTravellerEndedJourney(this.GetComponent<PortalableObject>()))
             {
                 SetSliceValueInit();
             }
+        }
+
+        if (cloneObject.activeSelf)
+        {
+            SetMySliceValueOnIn();
+            SetCloneSliceValueOnIn();
         }
     }
 
@@ -146,7 +146,7 @@ public class PortalableObject : MonoBehaviour
         }
     }
 
-    public void SetSliceValueInit() //초기화 시점 생각할 것
+    public void SetSliceValueInit()
     {
         for (int i = 0; i < _myCloneMaterials.Length; i++)
         {
