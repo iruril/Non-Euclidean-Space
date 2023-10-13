@@ -7,12 +7,14 @@ public class Portal : MonoBehaviour
     [field:SerializeField]
     public Portal PairPortal { get; private set; }
 
+    public PortalPair PortalPair { get; private set; }
     private List<PortalableObject> _portalObjects = new();
 
     public Renderer PortalScreenRenderer { get; private set; }
     private void Awake()
     {
         PortalScreenRenderer = transform.GetChild(0).GetChild(0).GetComponent<Renderer>();
+        PortalPair = this.transform.parent.GetComponent<PortalPair>();
     }
 
     private void Update()
@@ -47,5 +49,10 @@ public class Portal : MonoBehaviour
             _portalObjects.Remove(obj);
             obj.ExitPortal();
         }
+    }
+
+    public bool IsContainThisTraveller(PortalableObject Travellar)
+    {
+        return _portalObjects.Contains(Travellar);
     }
 }

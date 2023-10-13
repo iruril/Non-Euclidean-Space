@@ -15,4 +15,13 @@ public class PortalPair : MonoBehaviour
             Debug.LogError("포탈의 짝이 맞지 않습니다.");
         }
     }
+
+    public bool CheckThisTravellerEndedJourney(PortalableObject Travellar)
+    {
+        foreach(Portal portal in Portals)
+        {
+            if (portal.IsContainThisTraveller(Travellar)) return false;
+        }
+        return true;
+    }
 }

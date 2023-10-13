@@ -35,7 +35,7 @@ public class PortalableObject : MonoBehaviour
         for(int i = 0; i < _myMaterials.Length; i++)
         {
             _myCloneMaterials[i] = _cloneMaterial;
-            _myCloneMaterials[i].SetTexture("_MainTexture", GetComponent<MeshRenderer>().materials[i].mainTexture);
+            _myCloneMaterials[i].SetTexture("_MainTexture", GetComponent<MeshRenderer>().materials[i].GetTexture("_MainTexture"));
         }
         meshRenderer.materials = _myCloneMaterials;
         _myCloneMaterials = cloneObject.GetComponent<MeshRenderer>().materials;
@@ -43,7 +43,7 @@ public class PortalableObject : MonoBehaviour
 
         _myRigid = GetComponent<Rigidbody>();
         _myCollider = GetComponent<Collider>();
-        _colRadius = _myCollider.bounds.extents.magnitude;
+        _colRadius = _myCollider.bounds.min.magnitude;
     }
 
     private void FixedUpdate()
@@ -51,6 +51,15 @@ public class PortalableObject : MonoBehaviour
         if (cloneObject.activeSelf)
         {
             SetCloneSliceValueOnIn();
+            SetMySliceValueOnIn();
+        }
+
+        if (_inPortal != null && _outPortal != null)
+        {
+            if (_inPortal.PortalPair.CheckThisTravellerEndedJourney(this.GetComponent<PortalableObject>()))
+            {
+                SetSliceValueInit();
+            }
         }
     }
 
@@ -93,7 +102,6 @@ public class PortalableObject : MonoBehaviour
     public void ExitPortal()
     {
         --_inPortalCount;
-
         if (_inPortalCount == 0)
         {
             cloneObject.SetActive(false);
@@ -116,6 +124,34 @@ public class PortalableObject : MonoBehaviour
                 _myCloneMaterials[i].SetVector("_SliceCenter", sliceCenter);
                 _myCloneMaterials[i].SetFloat("_SliceOffset", sliceOffset);
             }
+        }
+    }
+
+    private void SetMySliceValueOnIn() //for Me
+    {
+        _portalColBoundSizeZ = _outPortal.GetComponent<Collider>().bounds.size.z;
+
+        Vector3 sliceNormal = _inPortal.transform.forward;
+        Vector3 sliceCenter = _inPortal.transform.position;
+        if (Physics.Raycast(this.transform.position, sliceNormal, out RaycastHit hitInfo, _colRadius + 1.0f, 1 << LayerMask.NameToLayer("Portal")))
+        {
+            float dist = Vector3.Distance(hitInfo.point, this.transform.position);
+            float sliceOffset = (dist / _colRadius) + _portalColBoundSizeZ;
+            for (int i = 0; i < _myMaterials.Length; i++)
+            {
+                GetComponent<MeshRenderer>().materials[i].SetVector("_SliceNormal", -sliceNormal);
+                GetComponent<MeshRenderer>().materials[i].SetVector("_SliceCenter", sliceCenter);
+                GetComponent<MeshRenderer>().materials[i].SetFloat("_SliceOffset", sliceOffset);
+            }
+        }
+    }
+
+    public void SetSliceValueInit() //초기화 시점 생각할 것
+    {
+        for (int i = 0; i < _myCloneMaterials.Length; i++)
+        {
+            _myCloneMaterials[i].SetVector("_SliceNormal", Vector3.zero);
+            GetComponent<MeshRenderer>().materials[i].SetVector("_SliceNormal", Vector3.zero);
         }
     }
 
