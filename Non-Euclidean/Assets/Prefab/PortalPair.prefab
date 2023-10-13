@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7493786634652518108}
   - component: {fileID: 7493786634652518110}
   - component: {fileID: 7493786634652518105}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: BlueGate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25,15 +25,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7493786634652518109}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: 0.28520712, z: -0, w: 0.95846593}
+  m_LocalPosition: {x: 14.35, y: 0, z: 5.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7196117359894362858}
   m_Father: {fileID: 7493786635028039759}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 33.142, z: 0}
 --- !u!65 &7493786634652518110
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -45,7 +45,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 4, y: 2.6, z: 0.5}
+  m_Size: {x: 4, y: 2.6, z: 1}
   m_Center: {x: 0, y: 1.3, z: 0}
 --- !u!114 &7493786634652518105
 MonoBehaviour:
@@ -243,7 +243,7 @@ GameObject:
   - component: {fileID: 7493786636405959051}
   - component: {fileID: 7493786636405959045}
   - component: {fileID: 7493786636405959044}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: WhiteGate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -257,15 +257,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7493786636405959048}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0.36984786, z: -0, w: 0.9290924}
+  m_LocalPosition: {x: -13.98, y: 0, z: 5.97}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8518138019481821006}
   m_Father: {fileID: 7493786635028039759}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -43.412, z: 0}
 --- !u!65 &7493786636405959045
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -277,7 +277,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 4, y: 2.6, z: 0.5}
+  m_Size: {x: 4, y: 2.6, z: 1}
   m_Center: {x: 0, y: 1.3, z: 0}
 --- !u!114 &7493786636405959044
 MonoBehaviour:
@@ -377,6 +377,26 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7230256393074973953}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7582749671928898644 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8256134651489076907, guid: f0667582799f54c4b837c110cac447d6,
+    type: 3}
+  m_PrefabInstance: {fileID: 7230256393074973953}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &1580307917
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7582749671928898644}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -1875780437015597444, guid: f0667582799f54c4b837c110cac447d6, type: 3}
 --- !u!1001 &8195487100595599525
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -462,3 +482,23 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8195487100595599525}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8993804315562394096 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8256134651489076907, guid: f0667582799f54c4b837c110cac447d6,
+    type: 3}
+  m_PrefabInstance: {fileID: 8195487100595599525}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &1629105919
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8993804315562394096}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -1875780437015597444, guid: f0667582799f54c4b837c110cac447d6, type: 3}

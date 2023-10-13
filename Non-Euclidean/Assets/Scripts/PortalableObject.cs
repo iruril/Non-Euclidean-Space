@@ -18,7 +18,6 @@ public class PortalableObject : MonoBehaviour
     protected Collider _myCollider;
 
     private float _colRadius = 0;
-    private float _portalColBoundSizeZ = 0;
 
     private static readonly Quaternion halfTurn = Quaternion.Euler(0.0f, 180.0f, 0.0f);
 
@@ -43,7 +42,7 @@ public class PortalableObject : MonoBehaviour
 
         _myRigid = GetComponent<Rigidbody>();
         _myCollider = GetComponent<Collider>();
-        _colRadius = _myCollider.bounds.min.magnitude;
+        _colRadius = GetComponent<SphereCollider>().radius;
     }
 
     private void FixedUpdate()
@@ -95,7 +94,6 @@ public class PortalableObject : MonoBehaviour
         this._outPortal = outPortal;
 
         cloneObject.SetActive(true);
-
         ++_inPortalCount;
     }
 
@@ -110,43 +108,71 @@ public class PortalableObject : MonoBehaviour
 
     private void SetCloneSliceValueOnIn() //for Clone
     {
-        _portalColBoundSizeZ = _outPortal.GetComponent<Collider>().bounds.size.z;
-
-        Vector3 sliceNormal = _outPortal.transform.forward;
+        Vector3 sliceNormal = -_outPortal.transform.forward;
         Vector3 sliceCenter = _outPortal.transform.position;
-        if (Physics.Raycast(cloneObject.transform.position, -sliceNormal,out RaycastHit hitInfo ,_colRadius + 1.0f, 1 << LayerMask.NameToLayer("Portal")))
+
+        Vector3 startPos = cloneObject.transform.position - sliceNormal * _colRadius;
+        //if (Physics.Raycast(rayStartPos, -sliceNormal,out RaycastHit hitInfo, 2 * _colRadius + 1.0f, 1 << LayerMask.NameToLayer("Portal"),
+        //    QueryTriggerInteraction.Collide))
+        //{
+        //    Debug.Log("Portal Screen! Clone");
+        //    float dist = Vector3.Distance(hitInfo.point, rayStartPos);
+        //    if (dist > 2 * _colRadius) return;
+
+        //    float sliceOffset = dist / (2 * _colRadius);
+        //    for (int i = 0; i < _myCloneMaterials.Length; i++)
+        //    {
+        //        _myCloneMaterials[i].SetVector("_SliceNormal", sliceNormal);
+        //        _myCloneMaterials[i].SetVector("_SliceCenter", sliceCenter);
+        //        _myCloneMaterials[i].SetFloat("_SliceOffset", 1f - sliceOffset);
+        //    }
+        //}
+        float dist = Vector3.Distance(_outPortal.PortalScreenRenderer.GetComponent<MeshCollider>().ClosestPoint(startPos), startPos);
+        float sliceOffset = dist / (2 * _colRadius);
+
+        return; // test
+        for (int i = 0; i < _myCloneMaterials.Length; i++)
         {
-            float dist = Vector3.Distance(hitInfo.point, cloneObject.transform.position);
-            float sliceOffset = (dist / _colRadius) + _portalColBoundSizeZ;
-            for(int i =0;i< _myCloneMaterials.Length; i++)
-            {
-                _myCloneMaterials[i].SetVector("_SliceNormal", -sliceNormal);
-                _myCloneMaterials[i].SetVector("_SliceCenter", sliceCenter);
-                _myCloneMaterials[i].SetFloat("_SliceOffset", sliceOffset);
-            }
+            _myCloneMaterials[i].SetVector("_SliceNormal", sliceNormal);
+            _myCloneMaterials[i].SetVector("_SliceCenter", sliceCenter);
+            _myCloneMaterials[i].SetFloat("_SliceOffset", sliceOffset);
         }
     }
 
     private void SetMySliceValueOnIn() //for Me
     {
-        _portalColBoundSizeZ = _outPortal.GetComponent<Collider>().bounds.size.z;
-
         Vector3 sliceNormal = _inPortal.transform.forward;
         Vector3 sliceCenter = _inPortal.transform.position;
-        if (Physics.Raycast(this.transform.position, sliceNormal, out RaycastHit hitInfo, _colRadius + 1.0f, 1 << LayerMask.NameToLayer("Portal")))
+
+        Vector3 startPos = this.transform.position - sliceNormal * _colRadius;
+        //if (Physics.Raycast(rayStartPos, -sliceNormal, out RaycastHit hitInfo, 2 * _colRadius + 1.0f, 1 << LayerMask.NameToLayer("Portal"),
+        //    QueryTriggerInteraction.Collide))
+        //{
+        //    Debug.Log("Portal Screen! My");
+        //    float dist = Vector3.Distance(hitInfo.point, rayStartPos);
+        //    if (dist > 2 * _colRadius) return;
+
+        //    float sliceOffset = dist / (2 * _colRadius);
+        //    for (int i = 0; i < _myMaterials.Length; i++)
+        //    {
+        //        GetComponent<MeshRenderer>().materials[i].SetVector("_SliceNormal", -sliceNormal);
+        //        GetComponent<MeshRenderer>().materials[i].SetVector("_SliceCenter", sliceCenter);
+        //        GetComponent<MeshRenderer>().materials[i].SetFloat("_SliceOffset", 1f - sliceOffset);
+        //    }
+        //}
+        float dist = Vector3.Distance(_inPortal.PortalScreenRenderer.GetComponent<MeshCollider>().ClosestPoint(startPos), startPos);
+        float sliceOffset = dist / (2 * _colRadius);
+
+        return; // test
+        for (int i = 0; i < _myMaterials.Length; i++)
         {
-            float dist = Vector3.Distance(hitInfo.point, this.transform.position);
-            float sliceOffset = (dist / _colRadius) + _portalColBoundSizeZ;
-            for (int i = 0; i < _myMaterials.Length; i++)
-            {
-                GetComponent<MeshRenderer>().materials[i].SetVector("_SliceNormal", -sliceNormal);
-                GetComponent<MeshRenderer>().materials[i].SetVector("_SliceCenter", sliceCenter);
-                GetComponent<MeshRenderer>().materials[i].SetFloat("_SliceOffset", sliceOffset);
-            }
+            GetComponent<MeshRenderer>().materials[i].SetVector("_SliceNormal", -sliceNormal);
+            GetComponent<MeshRenderer>().materials[i].SetVector("_SliceCenter", sliceCenter);
+            GetComponent<MeshRenderer>().materials[i].SetFloat("_SliceOffset", 1f - sliceOffset);
         }
     }
 
-    public void SetSliceValueInit()
+    private void SetSliceValueInit()
     {
         for (int i = 0; i < _myCloneMaterials.Length; i++)
         {
@@ -175,7 +201,7 @@ public class PortalableObject : MonoBehaviour
         Portal tmp = _inPortal;
         _inPortal = _outPortal;
         _outPortal = tmp;
-
+        SetMySliceValueOnIn();
         SetCloneSliceValueOnIn();
     }
 
